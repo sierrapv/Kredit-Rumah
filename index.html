@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="halamanutama.css">
+</head>
+
+<body>
+    <main>
+        <section class="container">
+            <h1>
+                program kredit rumah
+            </h1>
+
+            <div class="form">
+                <form>
+                    <div class="typeRumah">
+                        <label for="type">Type Rumah:</label>
+                        <select id="type" onchange="typeChanged()">
+                            <option value="alamanda">ALAMANDA</option>
+                            <option value="mawar">MAWAR</option>
+                        </select>
+                    </div>
+
+                    <div class="lamaKredit">
+                        <label for="loan">Lama Kredit (Bulan):</label>
+                        <input type="text" id="loan">
+                    </div>
+                </form>
+            </div>
+
+            <div class="button">
+                <button>Proses</button>
+                <button>reset</button>
+            </div>
+        </section>
+
+        <section class="result">
+            <div class="main">
+                <h3>program kredit rumah</h3>
+                <div class="detail">
+                    <table>
+                        <tbody>
+                            <tr>
+                                <td><label for="tipe">Type Rumah</label></td>
+                                <td>=</td>
+                                <td><input type="text" id="tipe" readonly class="input"></td>
+                            </tr>
+                            <tr>
+                                <td><label for="harga">Harga Rumah</label></td>
+                                <td>=</td>
+                                <td><input type="text" id="harga" readonly class="input"></td>
+                            </tr>
+                            <tr>
+                                <td><label for="uangmuka">Uang Muka</label></td>
+                                <td>=</td>
+                                <td><input type="text" id="uangmuka" readonly class="input"></td>
+                            </tr>
+                            <tr>
+                                <td><label for="sisa">Sisa</label></td>
+                                <td>=</td>
+                                <td><input type="text" id="sisa" readonly class="input"></td>
+                            </tr>
+                            <tr>
+                                <td><label for="lamakredit">Lama Kredit</label></td>
+                                <td>=</td>
+                                <td>
+                                    <div id="lamakredit"></div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td><label for="angsuran">Angsuran</label></td>
+                                <td>=</td>
+                                <td>
+                                    <div id="angsuran"></div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="result-container">
+                <table class="hasil" id="hasil">
+                    <thead>
+                        <tr>
+                            <th>Bulan</th>
+                            <th>Angsuran</th>
+                            <th>Sisa</th>
+                        </tr>
+                    </thead>
+                    <tbody id="result">
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        //prices = harga rumah
+        //downpayments = uang muka
+        //remainder = sisa
+        let types = {
+            alamanda: 'ALAMANDA',
+            mawar: 'MAWAR'
+        };
+
+        let prices = {
+            alamanda: 120000000,
+            mawar: 130000000
+        };
+
+        let downpayments = {
+            alamanda: 24000000,
+            mawar: 26000000
+        };
+
+        let remainder = {
+            alamanda: 120000000 - 24000000,
+            mawar: 130000000 - 26000000
+        };
+
+        function typeChanged() {
+            let tipe = document.getElementById('type').value;
+            document.getElementById('tipe').value = types[tipe];
+            document.getElementById('harga').value = prices[tipe];
+            document.getElementById('uangmuka').value = downpayments[tipe];
+            document.getElementById('sisa').value = remainder[tipe];
+
+            let Loan = document.getElementById('loan').value;
+            document.getElementById('lamakredit').textContent = `${Loan}`;
+
+            let selectedType = document.getElementById('type').value;
+            let housePrices = {
+                alamanda: 120000000,
+                mawar: 130000000
+            };
+            let downPaymentPercentage = 0.2; // Uang muka 20%
+            let price = housePrices[selectedType];
+            let downPayment = price * downPaymentPercentage;
+            let loanAmount = price - downPayment;
+
+            let loanTermInMonths = parseInt(document.getElementById('loan').value);
+            let totalMonths = loanTermInMonths;
+            let monthlyPayment = loanAmount / totalMonths;
+
+            document.getElementById('angsuran').textContent = `${monthlyPayment}`;
+            calculate();
+        }
+
+
+        function calculate() {
+            let selectedType = document.getElementById('type').value;
+            let housePrices = {
+                alamanda: 120000000,
+                mawar: 130000000
+            };
+
+            let downPaymentPercentage = 0.2; // Uang muka 20%
+            let price = housePrices[selectedType];
+            let downPayment = price * downPaymentPercentage;
+            let loanAmount = price - downPayment;
+
+            let loanTermInMonths = parseInt(document.getElementById('loan').value, 10);
+            let totalMonths = loanTermInMonths;
+            let monthlyPayment = loanAmount / totalMonths;
+
+            let result = '';
+
+            for (let i = 1; i <= totalMonths; i++) {
+                loanAmount -= monthlyPayment;
+
+                result += '<tr><td>' + i + '</td><td>' + monthlyPayment + '</td><td>' + loanAmount + '</td></tr>';
+
+                // Jika sisa sudah 0, hentikan perulangan
+                if (loanAmount <= 0) {
+                    break;
+                }
+            }
+
+            document.getElementById('result').innerHTML = result;
+            document.getElementById('lamakredit').textContent = `${loanTermInMonths}`;
+            document.getElementById('angsuran').textContent = `${monthlyPayment}`;
+        }
+
+
+        typeChanged();
+
+        document.addEventListener('DOMContentLoaded', function () {
+            let calculateButton = document.querySelector('.button button:nth-child(1)');
+            let resetButton = document.querySelector('.button button:nth-child(2)');
+
+            calculateButton.addEventListener('click', function (event) {
+                event.preventDefault();
+                calculate();
+                document.getElementById('hasil').scrollIntoView({ behavior: 'smooth' });
+            });
+
+            resetButton.addEventListener('click', function (event) {
+                event.preventDefault();
+                document.getElementById('type').value = 'alamanda';
+                typeChanged();
+                document.getElementById('loan').value = '';
+                document.getElementById('lamakredit').textContent = '';
+                document.getElementById('angsuran').textContent = '';
+                document.getElementById('result').innerHTML = '';
+            });
+        });
+    </script>
+</body>
+</html>
